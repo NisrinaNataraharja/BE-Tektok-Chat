@@ -39,18 +39,18 @@ exports.selectProductsWithCondition = async (req, res, next) => {
     condition.order = condition.order || 'ASC'
     const result = await productsModel.selectProductWithCondition(condition)
 
-     
-        const { rows: [count] } = await productsModel.countProducts()
-        const totalData = parseInt(count.total)
-        const totalPage = Math.ceil(totalData / condition.limit)
-        const pagination = {
-          currentPage: condition.page,
-          limit: condition.limit,
-          totalData,
-          totalPage
-        }
 
-        commonHelper.response(res, result.rows, 200, 'get data success', pagination)
+    const { rows: [count] } = await productsModel.countProducts()
+    const totalData = parseInt(count.total)
+    const totalPage = Math.ceil(totalData / condition.limit)
+    const pagination = {
+      currentPage: condition.page,
+      limit: condition.limit,
+      totalData,
+      totalPage
+    }
+
+    commonHelper.response(res, result.rows, 200, 'get data success', pagination)
   } catch (error) {
     console.log(error)
     next(errorServ)
@@ -61,10 +61,46 @@ exports.selectProductsWithCondition = async (req, res, next) => {
 exports.insertProducts = async (req, res, next) => {
   try {
     console.log(req.file);
+    const { categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at } = req.body
+    const image = JSON.parse(req.body.image)
+
+    const data = {
+      categoryid,
+      nameproduct,
+      description,
+      rating,
+      price,
+      stock,
+      size,
+      color,
+      condition,
+      seller,
+      brand,
+      status,
+      isarchieve,
+      created_at,
+      image: JSON.stringify(
+        image.map((item) => `${process.env.HOST}/image/${item.image}`)
+      )
+    }
+    console.log(data);
+    await productsModel.insertProducts(data)
+    commonHelper.response(res, data, 201, 'insert data success')
+  } catch (error) {
+    console.log(error)
+    next(errorServ)
+  }
+}
+
+
+exports.updateProducts = async(req, res, next) => {
+  try {
+    const id = req.params.id
   const { categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at } = req.body
   const image = JSON.parse(req.body.image)
-
+  console.log(image.length);
   const data = {
+    id,
     categoryid,
     nameproduct,
     description,
@@ -79,32 +115,16 @@ exports.insertProducts = async (req, res, next) => {
     status,
     isarchieve,
     created_at,
-    image: JSON.stringify(
-      image.map((item) => `${process.env.HOST}/image/${item.image}`)
-    )
+    image: image.length > 0 ? JSON.stringify(image.map((item) => `${process.env.HOST}/image/${item.image}`)) : undefined
+    
   }
-   console.log(data);
-   await productsModel.insertProducts(data)
-   commonHelper.response(res, data, 201, 'insert data success')
+  await productsModel.updateProducts(data)
+  commonHelper.response(res, data, 202, 'update data success')
   } catch (error) {
-      console.log(error)
+    console.log(error)
       next(errorServ)
   }
-}
-
-   
-exports.updateProducts = (req, res, next) => {
-  const id = req.params.id
-  const { categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at } = req.body
-  productsModel.updateProducts({ id, categoryid, nameproduct, description, rating, price, stock, size, color, 
-    condition, seller, brand, status, isarchieve, created_at})
-    .then(() => {
-      commonHelper.response(res, null, 202, 'update data success')
-    })
-    .catch((error) => {
-      console.log(error)
-      next(errorServ)
-    })
+  
 }
 
 exports.deleteProducts = (req, res, next) => {

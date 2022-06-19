@@ -35,7 +35,7 @@ exports.register = async (req, res, next) =>{
       isActive
     }
     create(data)
-    //sendEmail(email)
+    sendEmail(email)
     response(res, data.email, 201, 'user successfullyy register')
   } catch (error) {
     console.log(error)

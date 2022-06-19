@@ -8,7 +8,7 @@ const middUpload = require('../middlewares/upload')
 router
   .get('/', productController.selectProductsWithCondition)
   .post('/', protect, isSeller, middUpload("image"), productController.insertProducts)
-  .put('/:id', protect, isSeller, productController.updateProducts)
+  .put('/:id', protect, isSeller, middUpload("image"), productController.updateProducts)
   .delete('/:id', protect, isSeller, productController.deleteProducts)
 
 module.exports = router

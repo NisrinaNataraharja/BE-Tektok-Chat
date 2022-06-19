@@ -21,8 +21,22 @@ const insertProducts = ({ categoryid, nameproduct, description, rating, price, s
   return pool.query('INSERT INTO products (categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)', [categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image])
 }
 
-const updateProducts = ({categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, id}) => {
-  return pool.query('UPDATE products SET categoryid = $1, nameproduct = $2, description = $3, rating = $4, price = $5, stock = $6, size = $7, color = $8, condition = $9, seller = $10, brand = $11, status = $12, isarchieve = $13, created_at = $14 WHERE id = $15', [categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, id])
+const updateProducts = ({categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image, id}) => {
+  return pool.query(`UPDATE products SET categoryid = COALESCE($1, categoryid), 
+  nameproduct = COALESCE($2, nameproduct),
+  description = COALESCE($3, description),
+  rating = COALESCE($4, rating), 
+  price = COALESCE($5, price), 
+  stock = COALESCE($6, stock), 
+  size = COALESCE($7, size), 
+  color = COALESCE($8, color), 
+  condition = COALESCE($9, condition), 
+  seller = COALESCE($10, seller), 
+  brand = COALESCE($11, brand), 
+  status = COALESCE($12, status), 
+  isarchieve = COALESCE($13, isarchieve), 
+  created_at = COALESCE($14, created_at), 
+  image = COALESCE($15, image) WHERE id = $16;`, [categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image, id])
 }
 
 const deleteProducts = (id) => {

@@ -54,9 +54,7 @@ exports.updateTransaction = (req, res, next) => {
   const { productId, userId, quantity, totalShopping, deliveryCost, orderStatus, paymentMethod } = req.body
   transactionModel.updateTransaction({ idTransaction, productId, userId, quantity, totalShopping, deliveryCost, orderStatus, paymentMethod })
     .then(() => {
-      res.json({
-        message: 'update data success'
-      })
+        commonHelper.response(res, null, 202, 'update data success')
     })
     .catch((error) => {
       console.log(error)
@@ -68,9 +66,7 @@ exports.deleteTransaction = (req, res, next) => {
   const idTransaction = req.params.idTransaction
   transactionModel.deleteTransaction(idTransaction)
     .then(() => {
-      res.json({
-        message: 'delete data success'
-      })
+        commonHelper.response(res, null, 203, 'delete data success')
     })
     .catch((error) => {
       console.log(error)
