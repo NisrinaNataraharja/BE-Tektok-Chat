@@ -4,7 +4,7 @@ const pool = require('../config/db')
 //   return pool.query('SELECT * FROM products LIMIT $1 OFFSET $2', [limit, offset])
 // }
 
-const selectProductWithCondition = (condition) => {
+const selectRecipeWithCondition = (condition) => {
   //console.log(condition);
   return pool.query(`
   SELECT p.*
@@ -17,41 +17,142 @@ const selectProductWithCondition = (condition) => {
   `)
 }
 
-const insertProducts = ({ categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image }) => {
-  return pool.query('INSERT INTO products (categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)', [categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image])
+const insertRecipe = ({ id, id_user, ingredients, title, image, video, like, create_at }) => {
+  return pool.query('INSERT INTO recipes (id, id_user, ingredients, title, image, video, "like", create_at) VALUES($1, $2, $3, $4, $5, $6, $7)', [id, id_user, ingredients, title, image, video, like, create_at])
 }
 
-const updateProducts = ({categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image, id}) => {
-  return pool.query(`UPDATE products SET categoryid = COALESCE($1, categoryid), 
-  nameproduct = COALESCE($2, nameproduct),
-  description = COALESCE($3, description),
-  rating = COALESCE($4, rating), 
-  price = COALESCE($5, price), 
-  stock = COALESCE($6, stock), 
-  size = COALESCE($7, size), 
-  color = COALESCE($8, color), 
-  condition = COALESCE($9, condition), 
-  seller = COALESCE($10, seller), 
-  brand = COALESCE($11, brand), 
-  status = COALESCE($12, status), 
-  isarchieve = COALESCE($13, isarchieve), 
-  created_at = COALESCE($14, created_at), 
-  image = COALESCE($15, image) WHERE id = $16;`, [categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at, image, id])
+const updateRecipe = ({ingredients, title, image, video, like, create_at, id}) => {
+  return pool.query(`UPDATE products SET  
+  ingredients = COALESCE($1, ingredients),
+  title = COALESCE(2, title),
+  image = COALESCE($3, image), 
+  video = COALESCE($4, video), 
+  "like" = COALESCE($5, "like"), 
+  create_at = COALESCE($6, create_at), WHERE id = $7;`, [ingredients, title, image, video, like, create_at, id])
 }
 
-const deleteProducts = (id) => {
+const deleteRecipe = (id) => {
   return pool.query('DELETE FROM products WHERE id = $1', [id])
 }
 
-const countProducts = () => {
+const countRecipe = () => {
   return pool.query('SELECT COUNT(*) AS total FROM products')
 }
 
 module.exports = {
   ///selectProducts,
-  selectProductWithCondition,
-  updateProducts,
-  insertProducts,
-  deleteProducts,
-  countProducts
+  selectRecipeWithCondition,
+  updateRecipe,
+  insertRecipe,
+  deleteRecipe,
+  countRecipe
 }
+
+// const getAllRecipe = ({ limit, offset, sortBy, sortOrder, search }) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(`SELECT recipes.*, assets.image AS photo, assets.video, users.name AS recipe_by FROM recipes INNER JOIN assets ON recipes.id = assets.id_recipe INNER JOIN users ON recipes.id_user = users.id WHERE title ILIKE '%${search}%' ORDER BY ${sortBy} ${sortOrder} LIMIT $1 OFFSET $2`, [limit, offset], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
+// }
+
+// const countRecipes = () => {
+//   return pool.query('SELECT COUNT(*) AS total FROM recipes')
+// }
+
+// const insertRecipeData = ({ id, idUser, title, ingredients }) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query('INSERT INTO recipes(id, id_user, title, ingredients)VALUES($1, $2, $3, $4)', [id, idUser, title, ingredients], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
+// }
+
+// const insertRecipeAssets = ({ idRecipe, photo, video }) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query('INSERT INTO assets(id_recipe, image, video)VALUES($1, $2, $3)', [idRecipe, photo, video], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
+// }
+
+// const recipeDetail = (recipeID) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(`SELECT recipes.*, assets.image AS photo, assets.video, users.name AS recipe_by FROM recipes INNER JOIN assets ON recipes.id = assets.id_recipe INNER JOIN users ON recipes.id_user = users.id WHERE recipes.id = '${recipeID}';`, (error, result) => {
+//       if (!error) {
+//         resolve(result)
+//       } else {
+//         reject(error)
+//       }
+//     })
+//   })
+// }
+
+// const updateRecipeData = ({ title, ingredients, updatedAt }, recipeID, userID) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(`UPDATE recipes SET 
+//                 title = COALESCE($1, title), 
+//                 ingredients = COALESCE($2, ingredients),   
+//                 updated_at = COALESCE($3, updated_at) 
+//                 WHERE id = $4 AND id_user = $5;`, [title, ingredients, updatedAt, recipeID, userID], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
+// }
+
+// const checkExisting = (recipeID) => {
+//   return pool.query(`SELECT COUNT(*) AS total FROM recipes WHERE id = '${recipeID}';`)
+// }
+
+// const updateRecipeAssets = ({ photo, video, updatedAt }, recipeID) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(`UPDATE assets SET 
+//                 image = COALESCE($1, image), 
+//                 video = COALESCE($2, video),   
+//                 updated_at = COALESCE($3, updated_at) 
+//                 WHERE id_recipe = $4;`, [photo, video, updatedAt, recipeID], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
+// }
+
+// const deleteRecipeData = (recipeID) => {
+//   return pool.query('DELETE FROM recipes WHERE id = $1', [recipeID])
+// }
+
+// const deleteRecipeAssets = (recipeID) => {
+//   return pool.query('DELETE FROM assets WHERE id_recipe = $1', [recipeID])
+// }
+
+// module.exports = {
+//   getAllRecipe,
+//   countRecipes,
+//   insertRecipeData,
+//   insertRecipeAssets,
+//   recipeDetail,
+//   updateRecipeData,
+//   updateRecipeAssets,
+//   checkExisting,
+//   deleteRecipeData,
+//   deleteRecipeAssets
+// }

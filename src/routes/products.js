@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const productController = require('../controller/products')
-const { protect, isSeller } = require('../middlewares/auth')
+const { protect } = require('../middlewares/auth')
 const middUpload = require('../middlewares/upload')
 
 
 router
-  .get('/', productController.selectProductsWithCondition)
-  .post('/', protect, isSeller, middUpload("image"), productController.insertProducts)
-  .put('/:id', protect, isSeller, middUpload("image"), productController.updateProducts)
-  .delete('/:id', protect, isSeller, productController.deleteProducts)
+  .get('/', productController.selectProductsRecipeWithCondition)
+  .post('/', protect, middUpload("image"), productController.insertRecipe)
+  .put('/:id', protect, middUpload("image"), productController.updateRecipe)
+  .delete('/:id', protect, productController.deleteRecipe)
 
 module.exports = router

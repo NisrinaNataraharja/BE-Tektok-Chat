@@ -14,28 +14,22 @@ const errorServ = new createError.InternalServerError()
 
 exports.register = async (req, res, next) =>{
   try {
-    const {idUser, nameStore, descriptionStore, email, password, role, phone, gender, birthday, name, city, imageUser, isActive} = req.body
+    const {id, name, email, phone, avatar, password, active} = req.body
     const {rowCount} = await findByEmail(email)
     if (rowCount) {
       return next(createError(403, 'user already registered'))
     }
     const data = {
-      idUser: uuidv4(idUser), 
-      nameStore, 
-      descriptionStore, 
-      email, 
-      password: await hashPassword(password), 
-      role, 
-      phone, 
-      gender, 
-      birthday, 
+      id: uuidv4(id), 
       name, 
-      city, 
-      imageUser, 
-      isActive
+      email, 
+      phone,
+      avatar,
+      password: await hashPassword(password),  
+      active
     }
     create(data)
-    sendEmail(email)
+    // sendEmail(email)
     response(res, data.email, 201, 'user successfullyy register')
   } catch (error) {
     console.log(error)
@@ -58,7 +52,7 @@ exports.login = async (req, res, next) =>{
 
 const payload ={
   email: user.email,
-  role: user.role
+  // role: user.role
 } 
  //generate token
 user.token = authHelper.generateToken(payload)

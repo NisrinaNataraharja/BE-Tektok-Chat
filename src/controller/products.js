@@ -2,6 +2,7 @@
 const createError = require('http-errors')
 const productsModel = require('../models/products')
 const commonHelper = require('../helper/common')
+const { v4: uuidv4 } = require('uuid');
 const errorServ = new createError.InternalServerError()
 
 // exports.selectProducts = async (req, res, next) => {
@@ -28,7 +29,7 @@ const errorServ = new createError.InternalServerError()
 //   }
 // }
 
-exports.selectProductsWithCondition = async (req, res, next) => {
+exports.selectRecipeWithCondition = async (req, res, next) => {
   try {
     const condition = req.query
     condition.search = condition.search || ''
@@ -37,10 +38,10 @@ exports.selectProductsWithCondition = async (req, res, next) => {
     condition.offset = (condition.page * condition.limit) - condition.limit
     condition.sort = condition.sort || 'id'
     condition.order = condition.order || 'ASC'
-    const result = await productsModel.selectProductWithCondition(condition)
+    const result = await productsModel.selectRecipeWithCondition(condition)
 
 
-    const { rows: [count] } = await productsModel.countProducts()
+    const { rows: [count] } = await productsModel.countRecipe()
     const totalData = parseInt(count.total)
     const totalPage = Math.ceil(totalData / condition.limit)
     const pagination = {
@@ -58,33 +59,26 @@ exports.selectProductsWithCondition = async (req, res, next) => {
 }
 
 
-exports.insertProducts = async (req, res, next) => {
+exports.insertRecipe = async (req, res, next) => {
   try {
     console.log(req.file);
-    const { categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at } = req.body
-    const image = JSON.parse(req.body.image)
+    const { id, id_user, ingredients, title, image, video, like, create_at } = req.body
 
     const data = {
-      categoryid,
-      nameproduct,
-      description,
-      rating,
-      price,
-      stock,
-      size,
-      color,
-      condition,
-      seller,
-      brand,
-      status,
-      isarchieve,
-      created_at,
-      image: JSON.stringify(
-        image.map((item) => `${process.env.HOST}/image/${item.image}`)
-      )
+      id: uuidv4(id), 
+      id_user, 
+      ingredients, 
+      title, 
+      image, 
+      video, 
+      like, 
+      create_at
+      // : JSON.stringify(
+      //   image.map((item) => `${process.env.HOST}/image/${item.image}`)
+      // )
     }
     console.log(data);
-    await productsModel.insertProducts(data)
+    await productsModel.insertRecipe(data)
     commonHelper.response(res, data, 201, 'insert data success')
   } catch (error) {
     console.log(error)
@@ -93,32 +87,25 @@ exports.insertProducts = async (req, res, next) => {
 }
 
 
-exports.updateProducts = async(req, res, next) => {
+exports.updateRecipe = async(req, res, next) => {
   try {
     const id = req.params.id
-  const { categoryid, nameproduct, description, rating, price, stock, size, color, condition, seller, brand, status, isarchieve, created_at } = req.body
-  const image = JSON.parse(req.body.image)
-  console.log(image.length);
+  const {ingredients, title, image, video, like, create_at } = req.body
+  // const image = JSON.parse(req.body.image)
+  // console.log(image.length);
   const data = {
     id,
-    categoryid,
-    nameproduct,
-    description,
-    rating,
-    price,
-    stock,
-    size,
-    color,
-    condition,
-    seller,
-    brand,
-    status,
-    isarchieve,
-    created_at,
-    image: image.length > 0 ? JSON.stringify(image.map((item) => `${process.env.HOST}/image/${item.image}`)) : undefined
+    ingredients, 
+    title, 
+    image, 
+    video, 
+    like, 
+    create_at
+    
+    // image: image.length > 0 ? JSON.stringify(image.map((item) => `${process.env.HOST}/image/${item.image}`)) : undefined
     
   }
-  await productsModel.updateProducts(data)
+  await productsModel.updateRecipe(data)
   commonHelper.response(res, data, 202, 'update data success')
   } catch (error) {
     console.log(error)
@@ -127,9 +114,9 @@ exports.updateProducts = async(req, res, next) => {
   
 }
 
-exports.deleteProducts = (req, res, next) => {
+exports.deleteRecipe = (req, res, next) => {
   const id = req.params.id
-  productsModel.deleteProducts(id)
+  productsModel.deleteRecipe(id)
     .then(() => {
       commonHelper.response(res, null, 203, 'delete data success')
     })
