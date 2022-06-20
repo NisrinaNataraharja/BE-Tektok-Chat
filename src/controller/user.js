@@ -20,7 +20,7 @@ exports.register = async (req, res, next) =>{
       return next(createError(403, 'user already registered'))
     }
     const data = {
-      id: uuidv4(id), 
+      id: uuidv4(), 
       name, 
       email, 
       phone,
