@@ -17,24 +17,35 @@ const PORT = process.env.PORT || 5000
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(cors())
-app.use(helmet())
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}))
 app.use(morgan('dev'))
 app.use(xss())
 
 //
 app.use('/v1', mainRoute)
 
-
-app.use('/image', express.static(path.join(__dirname, '/upload')))
+app.use('/image', express.static(path.join(__dirname, '/upload/image')))
+app.use('/video', express.static(path.join(__dirname, '/upload/video')))
 app.all('*', (req, res, next) => {
+
   next(new createError.NotFound())
+
+
 })
+
+// app.use('/image', express.static(path.join(__dirname, '/upload')))
+// app.all('*', (req, res, next) => {
+//   next(new createError.NotFound())
+// })
 
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const messError = err.message || 'Internal Server Error'
   const statusCode = err.status || 500
+  
   res.status(statusCode).json({
     message: messError
   })

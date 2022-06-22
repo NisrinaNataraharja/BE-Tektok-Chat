@@ -5,24 +5,38 @@ const commonHelper = require('../helper/common')
 const { v4: uuidv4 } = require('uuid');
 const errorServ = new createError.InternalServerError()
 
-// exports.selectProducts = async (req, res, next) => {
+// exports.selectRecipeWithCondition = async (req, res, next) => {
 //   try {
 //     const page = parseInt(req.query.page) || 1
-//     const limit = parseInt(req.query.limit) || 5
+//     let limit = parseInt(req.query.limit) || 4
 //     const offset = (page - 1) * limit
-//     const result = await productsModel.selectProducts({ offset, limit })
 
-//         const { rows: [count] } = await productsModel.countProducts()
-//         const totalData = parseInt(count.total)
-//         const totalPage = Math.ceil(totalData / limit)
-//         const pagination = {
-//           currentPage: page,
-//           limit,
-//           totalData,
-//           totalPage
-//         }
+//     const sortBy = req.query.sortby || 'random ()'
+//     const sortOrder = req.query.sortorder || ''
+//     const search = req.query.search || ''
 
-//         commonHelper.response(res, result.rows, 200, 'get data success', pagination)
+//     const result = await productsModel.selectRecipeWithCondition({ limit, offset, sortBy, sortOrder, search })
+
+//     const { rows: [count] } = await productsModel.countRecipe()
+//     const totalData = search === '' ? parseInt(count.total) : (result.rows).length
+
+//     if (totalData < limit) {
+//       limit = totalData
+//     }
+
+//     if ((result.rows).length === 0) {
+//       notFoundRes(res, 404, 'Data not found')
+//     }
+
+//     const totalPage = Math.ceil(totalData / limit)
+//     const pagination = {
+//       currentPage: page,
+//       dataPerPage: limit,
+//       totalData,
+//       totalPage
+//     }
+
+//     response(res, result.rows, 200, 'Get data success', pagination)
 //   } catch (error) {
 //     console.log(error)
 //     next(errorServ)
@@ -58,25 +72,36 @@ exports.selectRecipeWithCondition = async (req, res, next) => {
   }
 }
 
-
 exports.insertRecipe = async (req, res, next) => {
   try {
-    console.log(req.file);
-    const { id, id_user, ingredients, title, image, video, like, create_at } = req.body
-
+    console.log(req.files.image[0]);
+    const { id_user, ingredients, title } = req.body
+    // const image = JSON.parse(req.body.image)
+    // const video = JSON.parse(req.body.video)
+    let image
+    let video
+    if (req.files.image) {
+      image = `${process.env.HOST_LOCAL_IMAGE}image/${req.files.image[0].filename}`
+    }
+    if (req.files.video) {
+      video = `${process.env.HOST_LOCAL_IMAGE}video/${req.files.video[0].filename}` 
+    }
     const data = {
-      id: uuidv4(id), 
+      id: uuidv4(), 
       id_user, 
       ingredients, 
       title, 
-      image, 
-      video, 
-      like, 
-      create_at
+      image,
       // : JSON.stringify(
-      //   image.map((item) => `${process.env.HOST}/image/${item.image}`)
-      // )
+      //   image.map((item) => `${process.env.HOST_LOCAL}/upload/image/${item.image}`)
+      // ), 
+      video
+      // : JSON.stringify(
+      //   video.map((item) => `${process.env.HOST_LOCAL}/upload/video/${item.video}`)
+      // ), 
+  
     }
+    
     console.log(data);
     await productsModel.insertRecipe(data)
     commonHelper.response(res, data, 201, 'insert data success')

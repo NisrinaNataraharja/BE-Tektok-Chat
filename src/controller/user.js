@@ -14,19 +14,21 @@ const errorServ = new createError.InternalServerError()
 
 exports.register = async (req, res, next) =>{
   try {
-    const {name, email, phone, password, active} = req.body
+    const {name, email, phone, password} = req.body
     const {rowCount} = await findByEmail(email)
     if (rowCount) {
       return next(createError(403, 'user already registered'))
     }
+    console.log(password);
     const data = {
       id: uuidv4(), 
       name, 
       email, 
       phone,
       password: await hashPassword(password),  
-      active
+  
     }
+
     create(data)
     // sendEmail(email)
     response(res, data.email, 201, 'user successfullyy register')

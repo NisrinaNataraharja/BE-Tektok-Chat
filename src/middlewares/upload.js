@@ -13,15 +13,18 @@ const multer = require('multer')
 //   const upload = multer({ storage: storage })
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === 'photo') {
-      cb(null, './upload/photo')
+    if (file.fieldname === 'image') {
+      cb(null, './upload/image')
     } else {
       cb(null, './upload/video')
     }
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.')[1])
+  filename: (req, file, cb) => {
+     cb(null, new Date().getTime() + "-" + file.originalname);
+  // filename: function (req, file, cb) {
+  //   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+  //   cb(null, new Date().getTime() + "-" + file.originalname);
+  //   cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.')[1])
   }
 })
 
@@ -41,7 +44,7 @@ const middUpload = multer({
     }
   },
   limits: { fileSize: maxSize }
-}).fields([{ name: 'photo', maxCount: 1 }, { name: 'video', maxCount: 1 }])
+}).fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }])
 
 
 module.exports = middUpload

@@ -1,24 +1,40 @@
 const pool = require('../config/db')
 
-// const selectProducts = ({ limit, offset }) => {
-//   return pool.query('SELECT * FROM products LIMIT $1 OFFSET $2', [limit, offset])
+// const selectRecipeWithCondition = ({ limit, offset, sortBy, sortOrder, search }) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(`SELECT recipes.* FROM recipes INNER JOIN "user" ON recipes.id_user = "user".id WHERE title ILIKE '%${search}%' ORDER BY ${sortBy} ${sortOrder} LIMIT $1 OFFSET $2`, [limit, offset], (err, result) => {
+//       if (!err) {
+//         resolve(result)
+//       } else {
+//         reject(new Error(err))
+//       }
+//     })
+//   })
 // }
 
 const selectRecipeWithCondition = (condition) => {
   //console.log(condition);
   return pool.query(`
-  SELECT p.*
-  FROM products p  
-  LEFT JOIN category c on p.categoryid = c."idCategory"
-  WHERE p.nameproduct ILIKE '%${condition.search}%' 
-  GROUP BY p.id, p.nameproduct, c."categoryName", p.description, p.rating, p.price, p.stock, p.condition, p.seller, p.brand, p.status
+  SELECT r.*
+  FROM recipes r  
+  LEFT JOIN "user" u on r.id_user = u.id
+  WHERE r.title ILIKE '%${condition.search}%' 
+  GROUP BY r.id, r.title, u.name, r.ingredients, r.image, r.video, r."like", r.create_at
   ORDER BY ${condition.sort} ${condition.order}
   LIMIT ${condition.limit} OFFSET ${condition.offset}
   `)
 }
 
+// SELECT p.*
+//   FROM products p  
+//   LEFT JOIN category c on p.categoryid = c."idCategory"
+//   WHERE p.nameproduct ILIKE '%${condition.search}%' 
+//   GROUP BY p.id, p.nameproduct, c."categoryName", p.description, p.rating, p.price, p.stock, p.condition, p.seller, p.brand, p.status
+//   ORDER BY ${condition.sort} ${condition.order}
+//   LIMIT ${condition.limit} OFFSET ${condition.offset}
+
 const insertRecipe = ({ id, id_user, ingredients, title, image, video, like, create_at }) => {
-  return pool.query('INSERT INTO recipes (id, id_user, ingredients, title, image, video, "like", create_at) VALUES($1, $2, $3, $4, $5, $6, $7)', [id, id_user, ingredients, title, image, video, like, create_at])
+  return pool.query('INSERT INTO recipes (id, id_user, ingredients, title, image, video, "like", create_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [id, id_user, ingredients, title, image, video, like, create_at])
 }
 
 const updateRecipe = ({ingredients, title, image, video, like, create_at, id}) => {
@@ -36,7 +52,7 @@ const deleteRecipe = (id) => {
 }
 
 const countRecipe = () => {
-  return pool.query('SELECT COUNT(*) AS total FROM products')
+  return pool.query('SELECT COUNT(*) AS total FROM recipes')
 }
 
 module.exports = {
