@@ -25,7 +25,12 @@ const getMessage=(sender_id, receiver_id)=>{
     })
   })
 }
+const deleteMessage = (chat_id) => {
+  return pool.query('DELETE FROM chat WHERE chat_id = $1', [chat_id])
+}
+
 module.exports = {
   create,
-  getMessage
+  getMessage,
+  deleteMessage
 }

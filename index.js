@@ -21,8 +21,9 @@ const PORT = process.env.PORT || 5000
 const http = require('http')
 const httpServer = http.createServer(app)
 const io = new Server(httpServer, {
-  cors:{
-      origin: 'http://localhost:3000',
+  cors: {
+    origin: 'https://tektok-chat.netlify.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 })
 
@@ -72,6 +73,12 @@ io.on('connection', (socket)=>{
     })
   })
 
+  socket.on('deleteMessage', (data) => {
+    console.log(data)
+    messageModel.deleteMessage(data.chat_id)
+
+    socket.to(data.chat_id).emit('deleteMessageBE', data)
+  })
 
   socket.on('disconnect', ()=>{
       console.log(`ada perangkat yg terputus dengan id ${socket.id}`);
@@ -84,11 +91,12 @@ io.on('connection', (socket)=>{
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(cors({
-  credentials: true,
-  origin: 'http://localhost:3000'}))
-app.use(helmet({
-  crossOriginResourcePolicy: false,
+  origin: '*',
+  methods: 'GET,POST,PUT,DELETE',
+  preflightContinue: true,
+  optionsSuccessStatus: 200
 }))
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(morgan('dev'))
 app.use(xss())
 app.use(cookieParser())
