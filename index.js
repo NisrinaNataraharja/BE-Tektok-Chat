@@ -22,7 +22,7 @@ const http = require('http')
 const httpServer = http.createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: 'https://tektok-chat.netlify.app',
+    origin: ['https://tektok-chat.netlify.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 })
