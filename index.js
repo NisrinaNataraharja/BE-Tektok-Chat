@@ -28,13 +28,11 @@ const io = new Server(httpServer, {
 })
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-app.use(cors({
-  origin: '*',
-  methods: 'GET,POST,PUT,DELETE',
-  preflightContinue: true,
-  optionsSuccessStatus: 200
+app.use(cors())
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false
 }))
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(morgan('dev'))
 app.use(xss())
 app.use(cookieParser())
