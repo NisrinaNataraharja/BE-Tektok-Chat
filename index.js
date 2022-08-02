@@ -22,9 +22,39 @@ const http = require('http')
 const httpServer = http.createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: 'https://tektok-chat.netlify.app',
+    origin: 'http ://tektok-chat.netlify.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
+})
+app.use(express.json())
+app.use(express.urlencoded({extended: false}))
+app.use(cors({
+  origin: '*',
+  methods: 'GET,POST,PUT,DELETE',
+  preflightContinue: true,
+  optionsSuccessStatus: 200
+}))
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
+app.use(morgan('dev'))
+app.use(xss())
+app.use(cookieParser())
+
+//
+app.use('/v1', mainRoute)
+app.use('/image', express.static(path.join(__dirname, '/upload')))
+app.all('*', (req, res, next) => {
+  next(new createError.NotFound())
+})
+
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const messError = err.message || 'Internal Server Error'
+  const statusCode = err.status || 500
+  
+  res.status(statusCode).json({
+    message: messError
+  })
 })
 
 io.use((socket, next)=>{
@@ -88,21 +118,7 @@ io.on('connection', (socket)=>{
 
 
 
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
-app.use(cors({
-  origin: '*',
-  methods: 'GET,POST,PUT,DELETE',
-  preflightContinue: true,
-  optionsSuccessStatus: 200
-}))
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
-app.use(morgan('dev'))
-app.use(xss())
-app.use(cookieParser())
 
-//
-app.use('/v1', mainRoute)
 
 // app.use('/image', express.static(path.join(__dirname, '/upload/image')))
 // app.use('/video', express.static(path.join(__dirname, '/upload/video')))
@@ -113,21 +129,7 @@ app.use('/v1', mainRoute)
 
 // })
 
-app.use('/image', express.static(path.join(__dirname, '/upload')))
-app.all('*', (req, res, next) => {
-  next(new createError.NotFound())
-})
 
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const messError = err.message || 'Internal Server Error'
-  const statusCode = err.status || 500
-  
-  res.status(statusCode).json({
-    message: messError
-  })
-})
 
 httpServer.listen(PORT, ()=>{
   console.log(`server is running in port ${PORT}`);
