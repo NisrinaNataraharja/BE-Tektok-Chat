@@ -78,8 +78,6 @@ NODE_ENV = dev or prod
 
 SECRET_KEY = secret_key_for_JWT
 
-EMAIL_FOR_SENDEMAIL = email_for_sendemail_nodemailer
-PASS_SEND_EMAIL = email_password_sendemail_nodemailer
 
 ```
 
